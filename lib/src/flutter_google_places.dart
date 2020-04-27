@@ -256,6 +256,9 @@ class _PlacesAutocompleteResult extends State<PlacesAutocompleteResult> {
 }
 
 class AppBarPlacesAutoCompleteTextField extends StatefulWidget {
+  AppBarPlacesAutoCompleteTextField({this.filled});
+  final bool filled;
+  
   @override
   _AppBarPlacesAutoCompleteTextFieldState createState() =>
       _AppBarPlacesAutoCompleteTextFieldState();
@@ -282,7 +285,7 @@ class _AppBarPlacesAutoCompleteTextFieldState
           ),
           decoration: InputDecoration(
             hintText: state.widget.hint,
-            filled: true,
+            filled: widget.filled,
             fillColor: Theme.of(context).brightness == Brightness.light
                 ? Colors.white30
                 : Colors.black38,
