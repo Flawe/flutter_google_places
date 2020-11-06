@@ -13,6 +13,7 @@ class PlacesAutocompleteWidget extends StatefulWidget {
   final String hint;
   final BorderRadius overlayBorderRadius;
   final Location location;
+  final Location origin;
   final num offset;
   final num radius;
   final String language;
@@ -46,6 +47,7 @@ class PlacesAutocompleteWidget extends StatefulWidget {
       this.overlayBorderRadius,
       this.offset,
       this.location,
+      this.origin,
       this.radius,
       this.language,
       this.sessionToken,
@@ -225,8 +227,9 @@ class _Loader extends StatelessWidget {
 class PlacesAutocompleteResult extends StatefulWidget {
   final ValueChanged<Prediction> onTap;
   final Widget logo;
+  final Function(Prediction) trailingWidget;
 
-  PlacesAutocompleteResult({this.onTap, this.logo});
+  PlacesAutocompleteResult({this.onTap, this.logo, this.trailingWidget});
 
   @override
   _PlacesAutocompleteResult createState() => _PlacesAutocompleteResult();
@@ -251,6 +254,7 @@ class _PlacesAutocompleteResult extends State<PlacesAutocompleteResult> {
     return PredictionsListView(
       predictions: state._response.predictions,
       onTap: widget.onTap,
+      trailingWidget: widget.trailingWidget
     );
   }
 }
@@ -337,14 +341,15 @@ class PoweredByGoogleImage extends StatelessWidget {
 class PredictionsListView extends StatelessWidget {
   final List<Prediction> predictions;
   final ValueChanged<Prediction> onTap;
+  final Function(Prediction) trailingWidget;
 
-  PredictionsListView({@required this.predictions, this.onTap});
+  PredictionsListView({@required this.predictions, this.onTap, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: predictions
-          .map((Prediction p) => PredictionTile(prediction: p, onTap: onTap))
+          .map((Prediction p) => PredictionTile(prediction: p, onTap: onTap, trailingWidget: trailingWidget))
           .toList(),
     );
   }
@@ -353,14 +358,16 @@ class PredictionsListView extends StatelessWidget {
 class PredictionTile extends StatelessWidget {
   final Prediction prediction;
   final ValueChanged<Prediction> onTap;
+  final Function(Prediction) trailingWidget;
 
-  PredictionTile({@required this.prediction, this.onTap});
+  PredictionTile({@required this.prediction, this.onTap, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(Icons.location_on),
       title: Text(prediction.description),
+      trailing: trailingWidget != null ? trailingWidget(prediction) : null,
       onTap: () {
         if (onTap != null) {
           onTap(prediction);
@@ -407,6 +414,7 @@ abstract class PlacesAutocompleteState extends State<PlacesAutocompleteWidget> {
         value,
         offset: widget.offset,
         location: widget.location,
+        origin: widget.origin,
         radius: widget.radius,
         language: widget.language,
         sessionToken: widget.sessionToken,
@@ -479,6 +487,7 @@ class PlacesAutocomplete {
       BorderRadius overlayBorderRadius,
       num offset,
       Location location,
+      Location origin,
       num radius,
       String language,
       String sessionToken,
@@ -500,6 +509,7 @@ class PlacesAutocomplete {
         components: components,
         types: types,
         location: location,
+        origin: origin,
         radius: radius,
         strictbounds: strictbounds,
         region: region,
